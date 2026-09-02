@@ -26,10 +26,6 @@ vendas.xlsx  →  leitor.py  →  processador.py  →  banco.py  →  relatorio.
 5. **`main.py`** — orquestra o pipeline inteiro, do arquivo de entrada
    ao relatório final, com tratamento de erros.
 
-## Exemplo de saída
-
-![Exemplo de relatório gerado](relatorio_exemplo.png)
-
 ## Como rodar
 
 ```bash
