@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# ambiente virtual
+.venv/
+venv/
+
+# banco de dados e arquivos gerados pelo pipeline
+*.db
+*.xlsx
+*.png
+!relatorio_exemplo.png
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# PyCharm
+.idea/
