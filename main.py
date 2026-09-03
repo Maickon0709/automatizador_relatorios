@@ -9,21 +9,37 @@ Uso:
 """
 
 import sys
+from pathlib import Path
 
 from leitor import ler_planilha_vendas
 from processador import processar
 from banco import conectar, salvar_vendas
 from relatorio import gerar_relatorio, gerar_imagem_relatorio
 
+# pasta onde os relatórios finais (.xlsx e .png) são salvos por padrão.
+# fica na Área de Trabalho do usuário, pra ser fácil de achar sem precisar
+# saber onde o projeto está instalado.
+PASTA_SAIDA_PADRAO = Path.home() / "Desktop" / "Relatorios de Vendas"
 
-def executar_pipeline(caminho_planilha: str) -> None:
+
+def executar_pipeline(caminho_planilha: str, pasta_saida: str | None = None) -> dict:
     """
     Executa o pipeline completo:
       1. Lê a planilha de vendas (leitor.py)
       2. Processa e calcula os totais (processador.py)
       3. Salva no banco SQLite (banco.py)
       4. Gera o relatório final em Excel e imagem (relatorio.py)
+
+    Parâmetros:
+        caminho_planilha: caminho do arquivo .xlsx de entrada
+        pasta_saida: pasta onde salvar os relatórios gerados.
+            Se não informado, usa PASTA_SAIDA_PADRAO.
+
+    Retorna:
+        dict com "caminho_xlsx" e "caminho_imagem" dos arquivos gerados.
     """
+    pasta_saida = pasta_saida or str(PASTA_SAIDA_PADRAO)
+
     print(f"1/4 Lendo planilha: {caminho_planilha}")
     df_vendas = ler_planilha_vendas(caminho_planilha)
     print(f"    {len(df_vendas)} venda(s) lida(s).")
@@ -42,12 +58,14 @@ def executar_pipeline(caminho_planilha: str) -> None:
         conn.close()
 
     print("4/4 Gerando relatório final...")
-    caminho_xlsx = gerar_relatorio(resultado)
-    caminho_imagem = gerar_imagem_relatorio(resultado)
+    caminho_xlsx = gerar_relatorio(resultado, pasta_saida=pasta_saida)
+    caminho_imagem = gerar_imagem_relatorio(resultado, pasta_saida=pasta_saida)
     print(f"    Excel : {caminho_xlsx}")
     print(f"    Imagem: {caminho_imagem}")
 
     print("\nPipeline concluído com sucesso.")
+
+    return {"caminho_xlsx": caminho_xlsx, "caminho_imagem": caminho_imagem}
 
 
 if __name__ == "__main__":
@@ -60,3 +78,4 @@ if __name__ == "__main__":
     except (FileNotFoundError, ValueError) as erro:
         print(f"Erro no pipeline: {erro}")
         sys.exit(1)
+
