@@ -31,10 +31,6 @@ vendas.xlsx  →  leitor.py  →  processador.py  →  banco.py  →  relatorio.
    são salvos automaticamente em uma pasta `Relatorios de Vendas` na
    Área de Trabalho.
 
-## Exemplo de saída
-
-![Exemplo de relatório gerado](relatorio_exemplo.png)
-
 ## Como rodar
 
 ### Opção 1 — Interface gráfica (recomendado para uso do dia a dia)
