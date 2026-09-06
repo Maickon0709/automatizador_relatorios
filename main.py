@@ -16,10 +16,36 @@ from processador import processar
 from banco import conectar, salvar_vendas
 from relatorio import gerar_relatorio, gerar_imagem_relatorio
 
+
+def _descobrir_pasta_area_de_trabalho() -> Path:
+    """
+    Descobre o caminho real da Área de Trabalho no Windows.
+
+    O Windows em português pode ter a pasta física com o nome
+    "Área de Trabalho" em vez de "Desktop" (comum quando o OneDrive
+    sincroniza as pastas conhecidas do usuário) — então não dá pra
+    simplesmente supor Path.home() / "Desktop". Aqui a gente pergunta
+    direto pro Windows, via registro, qual é o caminho de verdade.
+
+    Se não for Windows (ou não conseguir consultar o registro por
+    algum motivo), cai no palpite padrão Path.home() / "Desktop".
+    """
+    try:
+        import winreg
+        chave = winreg.OpenKey(
+            winreg.HKEY_CURRENT_USER,
+            r"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders",
+        )
+        caminho, _ = winreg.QueryValueEx(chave, "Desktop")
+        return Path(caminho)
+    except Exception:
+        return Path.home() / "Desktop"
+
+
 # pasta onde os relatórios finais (.xlsx e .png) são salvos por padrão.
 # fica na Área de Trabalho do usuário, pra ser fácil de achar sem precisar
 # saber onde o projeto está instalado.
-PASTA_SAIDA_PADRAO = Path.home() / "Desktop" / "Relatorios de Vendas"
+PASTA_SAIDA_PADRAO = _descobrir_pasta_area_de_trabalho() / "Relatorios de Vendas"
 
 
 def executar_pipeline(caminho_planilha: str, pasta_saida: str | None = None) -> dict:
